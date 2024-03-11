@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error accepting connection: ", err.Error())
 	}
-	_, err = connection.Write([]byte("HTTP/1.1 200 OK\\r\\n\\r\\n"))
+	_, err = connection.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	if err != nil {
 		log.Fatalln("Error writing answer: ", err.Error())
 	}
