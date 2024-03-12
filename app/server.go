@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error accepting connection: ", err.Error())
 	}
+	log.Println("OK in main")
 	req, err := request.ParseRequest(connection)
 	fmt.Println(req.Path)
 	if err != nil || req.Path != "/" {

@@ -3,6 +3,7 @@ package request
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -20,18 +21,25 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 	rd := bufio.NewReader(rawreq)
 	lines := []string{}
 	var prev byte = 0
-	var cur byte
 	line := []byte{}
 	var err error
-	for cur, err = rd.ReadByte(); err == nil; {
+	for {
+		cur, err := rd.ReadByte()
+		fmt.Println(cur, err, err == io.EOF, lines)
+		if err != nil {
+			lines = append(lines, string(line))
+			break
+		}
+		fmt.Println(prev, cur, '\r', '\n')
 		if prev == '\r' && cur == '\n' {
 			lines = append(lines, string(line))
 			line = []byte{}
-		} else {
+		} else if cur != '\n' && cur != '\r' {
 			line = append(line, cur)
-			prev = cur
 		}
+		prev = cur
 	}
+	fmt.Println("OKKKKK", lines)
 	if err != io.EOF {
 		return nil, err
 	}
