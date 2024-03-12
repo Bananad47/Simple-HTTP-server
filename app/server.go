@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/codecrafters-io/http-server-starter-go/internal/request"
 	"log"
 	"net"
@@ -21,12 +20,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error accepting connection: ", err.Error())
 	}
-	log.Println("OK in main")
 	req, err := request.ParseRequest(connection)
-	fmt.Println(req.Path)
 	if err != nil || req.Path != "/" {
-		connection.Write([]byte("HTTP/1.1 400 Not\r\n\r\n"))
+		connection.Write([]byte("HTTP/1.1 400 Not Found\r\n\r\n"))
 	} else {
 		connection.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	}
+	connection.Close()
 }

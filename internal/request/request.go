@@ -3,7 +3,6 @@ package request
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -23,26 +22,30 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 	var prev byte = 0
 	line := []byte{}
 	var err error
+	cntn := 0
+	cntr := 0
 	for {
 		cur, err := rd.ReadByte()
-		fmt.Println(cur, err, err == io.EOF, lines)
-		if err != nil {
-			lines = append(lines, string(line))
+		if err != nil || (cntr == 2 && cntn == 2) {
 			break
 		}
-		fmt.Println(prev, cur, '\r', '\n')
-		if prev == '\r' && cur == '\n' {
+		if prev == '\r' && cur == '\n' && len(line) > 0 {
 			lines = append(lines, string(line))
 			line = []byte{}
 		} else if cur != '\n' && cur != '\r' {
 			line = append(line, cur)
+			cntn = 0
+			cntr = 0
+		} else {
+			cntr++
+			cntn++
 		}
 		prev = cur
 	}
-	fmt.Println("OKKKKK", lines)
-	if err != io.EOF {
+	if err != nil && err != io.EOF {
 		return nil, err
 	}
+
 	if len(lines) < 1 {
 		return nil, IncorrectRequestError
 	}
@@ -50,11 +53,13 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 	if len(head) != 3 {
 		return nil, IncorrectRequestError
 	}
+
 	req := &Request{}
+	req.Headers = map[string]string{}
 	req.Method = head[0]
 	req.Path = head[1]
 	req.HttpVersion = head[2]
-	for _, headerline := range lines {
+	for _, headerline := range lines[1:] {
 		temp := strings.SplitN(headerline, ":", 2)
 		if len(temp) != 2 {
 			return nil, IncorrectRequestError
