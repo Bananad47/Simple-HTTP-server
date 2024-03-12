@@ -26,7 +26,7 @@ func CreateResponse(path string, statuscode string, headers map[string]string) *
 
 func (resp *Response) AddContent(content string) {
 	resp.Content = content
-	resp.Headers["Content-Length"] = strconv.Itoa(len([]byte(content)) + 4)
+	resp.Headers["Content-Length"] = strconv.Itoa(len([]byte(content)))
 }
 
 func (resp *Response) WriteResponse(wr io.Writer) error {

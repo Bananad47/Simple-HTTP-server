@@ -34,7 +34,7 @@ func main() {
 
 	req, err := request.ParseRequest(connection)
 
-	t, _ := regexp.Compile("/echo/([\\w]+)")
+	t, _ := regexp.Compile("/echo/([\\w/]+)")
 	m := t.FindStringSubmatch(req.Path)
 
 	if err != nil || (len(m) == 0 && req.Path != "/") {
