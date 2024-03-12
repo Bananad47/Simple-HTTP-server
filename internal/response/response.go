@@ -40,6 +40,6 @@ func (resp *Response) WriteResponse(wr io.Writer) error {
 			return err
 		}
 	}
-	_, err = fmt.Fprintf(wr, "%s\r\n\r\n", resp.Content)
+	_, err = fmt.Fprintf(wr, "\r\n%s\r\n\r\n", resp.Content)
 	return err
 }
