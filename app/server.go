@@ -48,6 +48,6 @@ func main() {
 		resp.WriteResponse(connection)
 		resp.WriteResponse(&test)
 	}
-	fmt.Println(test.String())
+	fmt.Println(test.String(), len(m), len(m[1]))
 	connection.Close()
 }
