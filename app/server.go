@@ -37,7 +37,7 @@ func main() {
 	t, _ := regexp.Compile("/echo/([\\w]+)")
 	m := t.FindStringSubmatch(req.Path)
 
-	if err != nil || (len(m) != 0 && len(m[1]) == 0) {
+	if err != nil || (len(m) == 0 && req.Path != "/") {
 		resp := response.CreateResponse(req.Path, "404 Not Found", headers)
 		resp.WriteResponse(connection)
 	} else {
@@ -48,6 +48,6 @@ func main() {
 		resp.WriteResponse(connection)
 		resp.WriteResponse(&test)
 	}
-	fmt.Println(test.String(), len(m), len(m[1]))
+	fmt.Println(test.String(), len(m), m)
 	connection.Close()
 }
