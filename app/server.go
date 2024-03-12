@@ -42,7 +42,9 @@ func main() {
 		resp.WriteResponse(connection)
 	} else {
 		resp := response.CreateResponse(req.Path, "200 OK", headers)
-		resp.AddContent(m[1])
+		if len(m) != 0 {
+			resp.AddContent(m[1])
+		}
 		resp.WriteResponse(connection)
 		resp.WriteResponse(&test)
 	}
