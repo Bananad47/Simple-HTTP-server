@@ -22,7 +22,7 @@ func main() {
 	}
 	req, err := request.ParseRequest(connection)
 	if err != nil || req.Path != "/" {
-		connection.Write([]byte("HTTP/1.1 400 Not Found\r\n\r\n"))
+		connection.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	} else {
 		connection.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	}
