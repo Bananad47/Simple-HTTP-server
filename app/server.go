@@ -30,7 +30,7 @@ func main() {
 		return resp
 	})
 
-	rt.GET("/", func(r *request.Request) *response.Response {
+	rt.GET("[/]$", func(r *request.Request) *response.Response {
 		resp := response.CreateResponse(r.Path, http.StatusOK)
 		resp.AddContent(constants.StatusMessages[http.StatusOK])
 		return resp
