@@ -65,7 +65,7 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 		if len(temp) != 2 {
 			return nil, IncorrectRequestError
 		}
-		req.Headers[temp[0]] = temp[1]
+		req.Headers[temp[0]] = strings.Trim(temp[1], " ")
 	}
 	return req, nil
 }
