@@ -16,9 +16,9 @@ func main() {
 
 	rt := router.NewRouter()
 
-	rt.GET("/echo/([\\w/]+)", func(r *request.Request) *response.Response {
+	rt.GET("/echo/(.+)", func(r *request.Request) *response.Response {
 		resp := response.CreateResponse(r.Path, http.StatusOK)
-		t, _ := regexp.Compile("/echo/([\\w/]+)")
+		t, _ := regexp.Compile("/echo/(.+)")
 		m := t.FindStringSubmatch(r.Path)
 		resp.AddContent(m[1])
 		return resp
