@@ -72,3 +72,21 @@ func (r *Router) ProcessConnection(con net.Conn) error {
 	err = resp.WriteResponse(con)
 	return err
 }
+
+func (r *Router) Launch(addr string) error {
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			return err
+		}
+
+		go func() {
+			r.ProcessConnection(conn)
+			conn.Close()
+		}()
+	}
+}
