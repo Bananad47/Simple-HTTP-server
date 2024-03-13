@@ -2,21 +2,39 @@ package main
 
 import (
 	"fmt"
-	"github.com/codecrafters-io/http-server-starter-go/internal/request"
-	"github.com/codecrafters-io/http-server-starter-go/internal/response"
+	"github.com/codecrafters-io/http-server-starter-go/pkg/constants"
+	"github.com/codecrafters-io/http-server-starter-go/pkg/request"
+	"github.com/codecrafters-io/http-server-starter-go/pkg/response"
+	"github.com/codecrafters-io/http-server-starter-go/pkg/router"
 	"log"
 	"net"
+	"net/http"
 	"regexp"
-	"strings"
 )
 
-var headers = map[string]string{
-	"Content-Type": "text/plain",
-}
-
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	//fmt.Println("Logs from your program will appear here!")
+
+	rt := router.NewRouter()
+
+	rt.GET("/echo/([\\w/]+)", func(r *request.Request) *response.Response {
+		resp := response.CreateResponse(r.Path, http.StatusOK)
+		t, _ := regexp.Compile("/echo/([\\w/]+)")
+		m := t.FindStringSubmatch(r.Path)
+		resp.AddContent(m[1])
+		return resp
+	})
+
+	rt.GET("/user-agent", func(r *request.Request) *response.Response {
+		resp := response.CreateResponse(r.Path, http.StatusOK)
+		resp.AddContent(r.Headers["User-Agent"])
+		return resp
+	})
+
+	rt.GET("/", func(r *request.Request) *response.Response {
+		resp := response.CreateResponse(r.Path, http.StatusOK)
+		resp.AddContent(constants.StatusMessages[http.StatusOK])
+		return resp
+	})
 
 	// Uncomment this block to pass the first stage
 	fmt.Println("Server Started")
@@ -29,25 +47,16 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error accepting connection: ", err.Error())
 	}
-
-	var test strings.Builder
-
-	req, err := request.ParseRequest(connection)
-
-	t, _ := regexp.Compile("/echo/([\\w/]+)")
-	m := t.FindStringSubmatch(req.Path)
-
-	if err != nil || (len(m) == 0 && req.Path != "/") {
-		resp := response.CreateResponse(req.Path, "404 Not Found", headers)
-		resp.WriteResponse(connection)
-	} else {
-		resp := response.CreateResponse(req.Path, "200 OK", headers)
-		if len(m) != 0 {
-			resp.AddContent(m[1])
+	defer func() {
+		if err := connection.Close(); err != nil {
+			log.Fatalln(err)
 		}
-		resp.WriteResponse(connection)
-		resp.WriteResponse(&test)
+	}()
+
+	err = rt.ProcessConnection(connection)
+	if err != nil {
+		log.Fatalln(err)
 	}
-	fmt.Println(test.String(), len(m), m)
-	connection.Close()
+
+	fmt.Println("Server closed")
 }

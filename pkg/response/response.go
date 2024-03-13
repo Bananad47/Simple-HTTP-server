@@ -10,18 +10,22 @@ type Response struct {
 	Headers     map[string]string
 	Path        string
 	HttpVersion string
-	StatusCode  string
+	StatusCode  int
 	Content     string
 }
 
-func CreateResponse(path string, statuscode string, headers map[string]string) *Response {
+func CreateResponse(path string, statuscode int) *Response {
 	resp := &Response{}
 	resp.Path = path
 	resp.HttpVersion = "HTTP/1.1"
 	resp.StatusCode = statuscode
-	resp.Headers = headers
+	resp.Headers = map[string]string{"Content-Type": "text/plain"}
 	resp.Headers["Content-Length"] = "0"
 	return resp
+}
+
+func (resp *Response) AddHeader(key, val string) {
+	resp.Headers[key] = val
 }
 
 func (resp *Response) AddContent(content string) {
@@ -30,7 +34,7 @@ func (resp *Response) AddContent(content string) {
 }
 
 func (resp *Response) WriteResponse(wr io.Writer) error {
-	_, err := fmt.Fprintf(wr, "%s %s\r\n", resp.HttpVersion, resp.StatusCode)
+	_, err := fmt.Fprintf(wr, "%s %d\r\n", resp.HttpVersion, resp.StatusCode)
 	if err != nil {
 		return err
 	}

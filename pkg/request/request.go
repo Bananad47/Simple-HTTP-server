@@ -3,13 +3,14 @@ package request
 import (
 	"bufio"
 	"errors"
+	"github.com/codecrafters-io/http-server-starter-go/pkg/constants"
 	"io"
 	"strings"
 )
 
 type Request struct {
 	Headers     map[string]string
-	Method      string
+	Method      constants.Method
 	Path        string
 	HttpVersion string
 }
@@ -56,7 +57,7 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 
 	req := &Request{}
 	req.Headers = map[string]string{}
-	req.Method = head[0]
+	req.Method = constants.ParseMethod(head[0])
 	req.Path = head[1]
 	req.HttpVersion = head[2]
 	for _, headerline := range lines[1:] {
