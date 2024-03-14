@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/codecrafters-io/http-server-starter-go/pkg/constants"
 	"github.com/codecrafters-io/http-server-starter-go/pkg/request"
@@ -14,7 +15,9 @@ import (
 )
 
 func main() {
+	dir := flag.String("directory", "/app", "files directory")
 
+	flag.Parse()
 	rt := router.NewRouter()
 
 	rt.GET("/echo/(.+)", func(r *request.Request) *response.Response {
@@ -32,14 +35,12 @@ func main() {
 	})
 
 	rt.GET("/files/(.+)", func(r *request.Request) *response.Response {
-
-		fmt.Println(os.Getwd())
-
 		resp := response.CreateResponse(r.Path, http.StatusOK)
 		resp.AddHeader("Content-Type", "application/octet-stream")
 		re, _ := regexp.Compile("/files/(.+)")
 		m := re.FindStringSubmatch(r.Path)
-		file, err := os.Open(m[1])
+
+		file, err := os.Open(*dir + m[1])
 		if err != nil {
 			resp.StatusCode = http.StatusNotFound
 			return resp
