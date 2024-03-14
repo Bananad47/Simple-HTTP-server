@@ -32,6 +32,9 @@ func main() {
 	})
 
 	rt.GET("/files/(.+)", func(r *request.Request) *response.Response {
+
+		fmt.Println(os.Getwd())
+
 		resp := response.CreateResponse(r.Path, http.StatusOK)
 		resp.AddHeader("Content-Type", "application/octet-stream")
 		re, _ := regexp.Compile("/files/(.+)")
