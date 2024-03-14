@@ -6,8 +6,10 @@ import (
 	"github.com/codecrafters-io/http-server-starter-go/pkg/request"
 	"github.com/codecrafters-io/http-server-starter-go/pkg/response"
 	"github.com/codecrafters-io/http-server-starter-go/pkg/router"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 )
 
@@ -17,8 +19,8 @@ func main() {
 
 	rt.GET("/echo/(.+)", func(r *request.Request) *response.Response {
 		resp := response.CreateResponse(r.Path, http.StatusOK)
-		t, _ := regexp.Compile("/echo/(.+)")
-		m := t.FindStringSubmatch(r.Path)
+		re, _ := regexp.Compile("/echo/(.+)")
+		m := re.FindStringSubmatch(r.Path)
 		resp.AddContent(m[1])
 		return resp
 	})
@@ -26,6 +28,22 @@ func main() {
 	rt.GET("/user-agent", func(r *request.Request) *response.Response {
 		resp := response.CreateResponse(r.Path, http.StatusOK)
 		resp.AddContent(r.Headers["User-Agent"])
+		return resp
+	})
+
+	rt.GET("/files/(.+)", func(r *request.Request) *response.Response {
+		resp := response.CreateResponse(r.Path, http.StatusOK)
+		resp.AddHeader("Content-Type", "application/octet-stream")
+		re, _ := regexp.Compile("/files/(.+)")
+		m := re.FindStringSubmatch(r.Path)
+		file, err := os.Open(m[1])
+		if err != nil {
+			resp.StatusCode = http.StatusNotFound
+			return resp
+		}
+		defer file.Close()
+		content, _ := io.ReadAll(file)
+		resp.AddContent(string(content))
 		return resp
 	})
 
