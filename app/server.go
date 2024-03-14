@@ -57,7 +57,21 @@ func main() {
 		return resp
 	})
 
-	// Uncomment this block to pass the first stage
+	rt.POST("/files/(.+)", func(r *request.Request) *response.Response {
+		resp := response.CreateResponse(r.Path, http.StatusCreated)
+		re, _ := regexp.Compile("/files/(.+)")
+		m := re.FindStringSubmatch(r.Path)
+
+		file, err := os.Create(*dir + m[1])
+		if err != nil {
+			resp.StatusCode = http.StatusBadGateway
+			return resp
+		}
+		defer file.Close()
+		file.WriteString(r.Body)
+		return resp
+	})
+
 	fmt.Println("Server Started")
 	log.Fatal(rt.Launch("0.0.0.0:4221"))
 }

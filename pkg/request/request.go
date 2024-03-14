@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/codecrafters-io/http-server-starter-go/pkg/constants"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -13,6 +14,7 @@ type Request struct {
 	Method      constants.Method
 	Path        string
 	HttpVersion string
+	Body        string
 }
 
 var IncorrectRequestError = errors.New("Incorrect request")
@@ -46,7 +48,6 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 	if err != nil && err != io.EOF {
 		return nil, err
 	}
-
 	if len(lines) < 1 {
 		return nil, IncorrectRequestError
 	}
@@ -67,5 +68,20 @@ func ParseRequest(rawreq io.Reader) (*Request, error) {
 		}
 		req.Headers[temp[0]] = strings.Trim(temp[1], " ")
 	}
+	prev = 0
+	var body string
+	cntn = 0
+	cntr = 0
+	t, _ := strconv.ParseInt(req.Headers["Content-Length"], 10, 64)
+	contentLen := int(t)
+	for i := 0; i != contentLen; i++ {
+		cur, _ := rd.ReadByte()
+		body += string(cur)
+	}
+	if err != nil && err != io.EOF {
+		return nil, err
+	}
+	req.Body = body
+
 	return req, nil
 }
